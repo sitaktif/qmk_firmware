@@ -97,11 +97,14 @@ void keyboard_post_init_user(void) {
 }
 
 
+// Highlight M1, ..., M5 keycap that corresponds to layer number
+const uint8_t M_LAYER_LED_INDICES[] = {4, 9, 14, 18, 23};
+
 bool rgb_matrix_indicators_user(void) {
     uint8_t current_layer = get_highest_layer(layer_state);
 
-    if (current_layer >= L0 && current_layer <= L4) {
-        rgb_matrix_set_color(LED_CIRCLE + current_layer, 170, 255, 255);
+    if (current_layer >= 0 && current_layer < 5) {
+        rgb_matrix_set_color(M_LAYER_LED_INDICES[current_layer], 170, 255, 255);
     }
     return true;
 }
