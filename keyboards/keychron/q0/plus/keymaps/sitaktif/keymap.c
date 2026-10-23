@@ -18,6 +18,9 @@
 
 // clang-format off
 
+// Note: QK_CYCLE_LAYERS is not used anymore: we don't go next/previous layer,
+// we activate each layer with each M1-M5 key. Keeping the code to cycle layers
+// around in case it's useful in the future.
 enum custom_keycodes {
     KC_CYCLE_LAYERS = QK_USER
 };
@@ -30,46 +33,48 @@ enum layers {
     L4
 };
 
+// TODO: try KC_WWW_HOME KC_MSEL KC_MYCM KC_CALC
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [L0] = LAYOUT_numpad_6x5(
-        KC_MUTE, QK_USER, KC_ESC,  KC_BSPC,  KC_TAB,
-        _______, KC_NUM,   KC_PSLS, KC_PAST,  KC_PMNS,
-        _______, KC_P7,    KC_P8,   KC_P9,    KC_PPLS,
-        _______, KC_P4,    KC_P5,   KC_P6,
-        _______, KC_P1,    KC_P2,   KC_P3,    KC_PENT,
-        _______, KC_P0,             KC_PDOT),
+        KC_MUTE, KC_WWW_HOME, KC_MSEL, KC_MYCM, KC_CALC,
+        TO(L0),  KC_NUM,   KC_PSLS, KC_PAST,  KC_PMNS,
+        TO(L1),  KC_P7,    KC_P8,   KC_P9,    KC_PPLS,
+        TO(L2),  KC_P4,    KC_P5,   KC_P6,
+        TO(L3),  KC_P1,    KC_P2,   KC_P3,    KC_PENT,
+        TO(L4),  KC_P0,             KC_PDOT),
 
     [L1] = LAYOUT_numpad_6x5(
-        RM_TOGG, QK_USER,   KC_MUTE, KC_VOLD,  KC_VOLU,
-        _______, RM_NEXT,  RM_VALU, RM_HUEU,  KC_DEL,
-        _______, RM_PREV,  RM_VALD, RM_HUED,  _______,
-        _______, RM_SATU,  RM_SPDU, KC_MPRV,
-        _______, RM_SATD,  RM_SPDD, KC_MPLY,  _______,
-        _______, RM_TOGG,           KC_MNXT),
+        RM_TOGG, KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L0),  KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L1),  KC_INT7, KC_INT8, KC_INT9, KC_LNG4,
+        TO(L2),  KC_INT4, KC_INT5, KC_INT6,
+        TO(L3),  KC_INT1, KC_INT2, KC_INT3,  KC_LNG3,
+        TO(L4),  KC_LNG1,          KC_LNG2),
 
     [L2] = LAYOUT_numpad_6x5(
-        RM_TOGG, QK_USER,   KC_MUTE, KC_VOLD,  KC_VOLU,
-        _______, RM_NEXT,  RM_VALU, RM_HUEU,  KC_DEL,
-        _______, RM_PREV,  RM_VALD, RM_HUED,  _______,
-        _______, RM_SATU,  RM_SPDU, KC_MPRV,
-        _______, RM_SATD,  RM_SPDD, KC_MPLY,  _______,
-        _______, RM_TOGG,           KC_MNXT),
+        RM_TOGG, KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L0),  KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L1),  KC_INT7, KC_INT8, KC_INT9, KC_LNG4,
+        TO(L2),  KC_INT4, KC_INT5, KC_INT6,
+        TO(L3),  KC_INT1, KC_INT2, KC_INT3,  KC_LNG3,
+        TO(L4),  KC_LNG1,          KC_LNG2),
 
     [L3] = LAYOUT_numpad_6x5(
-        RM_TOGG, QK_USER, KC_MUTE, KC_VOLD,  KC_VOLU,
-        _______, RM_NEXT,  RM_VALU, RM_HUEU,  KC_DEL,
-        _______, RM_PREV,  RM_VALD, RM_HUED,  _______,
-        _______, RM_SATU,  RM_SPDU, KC_MPRV,
-        _______, RM_SATD,  RM_SPDD, KC_MPLY,  _______,
-        _______, RM_TOGG,           KC_MNXT),
+        RM_TOGG, KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L0),  KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L1),  KC_INT7, KC_INT8, KC_INT9, KC_LNG4,
+        TO(L2),  KC_INT4, KC_INT5, KC_INT6,
+        TO(L3),  KC_INT1, KC_INT2, KC_INT3,  KC_LNG3,
+        TO(L4),  KC_LNG1,          KC_LNG2),
 
     [L4] = LAYOUT_numpad_6x5(
-        RM_TOGG, QK_USER, KC_MUTE, KC_VOLD,  KC_VOLU,
-        _______, RM_NEXT,  RM_VALU, RM_HUEU,  KC_DEL,
-        _______, RM_PREV,  RM_VALD, RM_HUED,  _______,
-        _______, RM_SATU,  RM_SPDU, KC_MPRV,
-        _______, RM_SATD,  RM_SPDD, KC_MPLY,  _______,
-        _______, RM_TOGG,           KC_MNXT),
+        RM_TOGG, KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L0),  KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L1),  KC_INT7, KC_INT8, KC_INT9, KC_LNG4,
+        TO(L2),  KC_INT4, KC_INT5, KC_INT6,
+        TO(L3),  KC_INT1, KC_INT2, KC_INT3,  KC_LNG3,
+        TO(L4),  KC_LNG1,          KC_LNG2),
 };
 
 #if defined(ENCODER_MAP_ENABLE)
