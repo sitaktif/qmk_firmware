@@ -30,7 +30,19 @@ enum layers {
     L1,
     L2,
     L3,
-    L4
+    L4,
+    L5,
+    L6,
+    L7,
+    L8
+};
+
+// Pressing two contiguous TO(Ln) keys together activates the matching new layer.
+enum combos {
+    COMBO_L5,
+    COMBO_L6,
+    COMBO_L7,
+    COMBO_L8
 };
 
 // TODO: try KC_WWW_HOME KC_MSEL KC_MYCM KC_CALC
@@ -75,7 +87,63 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         TO(L2),  KC_INT4, KC_INT5, KC_INT6,
         TO(L3),  KC_INT1, KC_INT2, KC_INT3,  KC_LNG3,
         TO(L4),  KC_LNG1,          KC_LNG2),
+
+    [L5] = LAYOUT_numpad_6x5(
+        RM_TOGG, KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L0),  KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L1),  KC_INT7, KC_INT8, KC_INT9, KC_LNG4,
+        TO(L2),  KC_INT4, KC_INT5, KC_INT6,
+        TO(L3),  KC_INT1, KC_INT2, KC_INT3,  KC_LNG3,
+        TO(L4),  KC_LNG1,          KC_LNG2),
+
+    [L6] = LAYOUT_numpad_6x5(
+        RM_TOGG, KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L0),  KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L1),  KC_INT7, KC_INT8, KC_INT9, KC_LNG4,
+        TO(L2),  KC_INT4, KC_INT5, KC_INT6,
+        TO(L3),  KC_INT1, KC_INT2, KC_INT3,  KC_LNG3,
+        TO(L4),  KC_LNG1,          KC_LNG2),
+
+    [L7] = LAYOUT_numpad_6x5(
+        RM_TOGG, KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L0),  KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L1),  KC_INT7, KC_INT8, KC_INT9, KC_LNG4,
+        TO(L2),  KC_INT4, KC_INT5, KC_INT6,
+        TO(L3),  KC_INT1, KC_INT2, KC_INT3,  KC_LNG3,
+        TO(L4),  KC_LNG1,          KC_LNG2),
+
+    [L8] = LAYOUT_numpad_6x5(
+        RM_TOGG, KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L0),  KC_LNG8, KC_LNG7, KC_LNG6, KC_LNG5,
+        TO(L1),  KC_INT7, KC_INT8, KC_INT9, KC_LNG4,
+        TO(L2),  KC_INT4, KC_INT5, KC_INT6,
+        TO(L3),  KC_INT1, KC_INT2, KC_INT3,  KC_LNG3,
+        TO(L4),  KC_LNG1,          KC_LNG2),
 };
+
+const uint16_t PROGMEM combo_l5[] = {TO(L0), TO(L1), COMBO_END};
+const uint16_t PROGMEM combo_l6[] = {TO(L1), TO(L2), COMBO_END};
+const uint16_t PROGMEM combo_l7[] = {TO(L2), TO(L3), COMBO_END};
+const uint16_t PROGMEM combo_l8[] = {TO(L3), TO(L4), COMBO_END};
+
+combo_t key_combos[] = {
+    [COMBO_L5] = COMBO(combo_l5, KC_NO),
+    [COMBO_L6] = COMBO(combo_l6, KC_NO),
+    [COMBO_L7] = COMBO(combo_l7, KC_NO),
+    [COMBO_L8] = COMBO(combo_l8, KC_NO),
+};
+
+void process_combo_event(uint16_t combo_index, bool pressed) {
+    if (!pressed) {
+        return;
+    }
+    switch (combo_index) {
+        case COMBO_L5: layer_move(L5); break;
+        case COMBO_L6: layer_move(L6); break;
+        case COMBO_L7: layer_move(L7); break;
+        case COMBO_L8: layer_move(L8); break;
+    }
+}
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
@@ -84,6 +152,10 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
     [L2] = { ENCODER_CCW_CW(RM_VALD, RM_VALU) },
     [L3] = { ENCODER_CCW_CW(RM_VALD, RM_VALU) },
     [L4] = { ENCODER_CCW_CW(RM_VALD, RM_VALU) },
+    [L5] = { ENCODER_CCW_CW(RM_VALD, RM_VALU) },
+    [L6] = { ENCODER_CCW_CW(RM_VALD, RM_VALU) },
+    [L7] = { ENCODER_CCW_CW(RM_VALD, RM_VALU) },
+    [L8] = { ENCODER_CCW_CW(RM_VALD, RM_VALU) },
 };
 #endif // ENCODER_MAP_ENABLE
 
@@ -105,11 +177,14 @@ void keyboard_post_init_user(void) {
 // Highlight M1, ..., M5 keycap that corresponds to layer number
 const uint8_t M_LAYER_LED_INDICES[] = {4, 9, 14, 18, 23};
 
+// New layers L5..L8 mirror L1..L4, so they highlight the same M keycap.
+const uint8_t M_LAYER_SOURCE[] = {L0, L1, L2, L3, L4, L1, L2, L3, L4};
+
 bool rgb_matrix_indicators_user(void) {
     uint8_t current_layer = get_highest_layer(layer_state);
 
-    if (current_layer >= 0 && current_layer < 5) {
-        rgb_matrix_set_color(M_LAYER_LED_INDICES[current_layer], 170, 255, 255);
+    if (current_layer < sizeof(M_LAYER_SOURCE)) {
+        rgb_matrix_set_color(M_LAYER_LED_INDICES[M_LAYER_SOURCE[current_layer]], 170, 255, 255);
     }
     return true;
 }
