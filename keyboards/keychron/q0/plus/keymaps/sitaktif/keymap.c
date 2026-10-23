@@ -177,14 +177,19 @@ void keyboard_post_init_user(void) {
 // Highlight M1, ..., M5 keycap that corresponds to layer number
 const uint8_t M_LAYER_LED_INDICES[] = {4, 9, 14, 18, 23};
 
-// New layers L5..L8 mirror L1..L4, so they highlight the same M keycap.
-const uint8_t M_LAYER_SOURCE[] = {L0, L1, L2, L3, L4, L1, L2, L3, L4};
+// New layers L5..L8 come from pressing two TO keys together, so they highlight
+// the M keycaps of both source layers (e.g. L5 from L0 + L1 lights M1 and M2).
+const uint8_t M_COMBO_LAYER_SOURCES[][2] = {{L0, L1}, {L1, L2}, {L2, L3}, {L3, L4}};
 
 bool rgb_matrix_indicators_user(void) {
     uint8_t current_layer = get_highest_layer(layer_state);
 
-    if (current_layer < sizeof(M_LAYER_SOURCE)) {
-        rgb_matrix_set_color(M_LAYER_LED_INDICES[M_LAYER_SOURCE[current_layer]], 170, 255, 255);
+    if (current_layer >= L0 && current_layer <= L4) {
+        rgb_matrix_set_color(M_LAYER_LED_INDICES[current_layer], 170, 255, 255);
+    } else if (current_layer >= L5 && current_layer <= L8) {
+        const uint8_t *sources = M_COMBO_LAYER_SOURCES[current_layer - L5];
+        rgb_matrix_set_color(M_LAYER_LED_INDICES[sources[0]], 170, 255, 255);
+        rgb_matrix_set_color(M_LAYER_LED_INDICES[sources[1]], 170, 255, 255);
     }
     return true;
 }
