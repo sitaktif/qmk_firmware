@@ -247,6 +247,47 @@ bool rgb_matrix_indicators_user(void) {
     return true;
 }
 
+// Layers L1..L11 hold modifiers in their number: layer n uses the bits of (n - 1),
+// with meta = 1, alt = 2, ctrl = 4 and shift = 8.
+static uint8_t layer_mods(uint8_t layer) {
+    if (layer < L1) {
+        return 0;
+    }
+    uint8_t bits = layer - L1;
+    uint8_t mods = 0;
+    if (bits & 0x1) mods |= MOD_BIT(KC_LGUI);
+    if (bits & 0x2) mods |= MOD_BIT(KC_LALT);
+    if (bits & 0x4) mods |= MOD_BIT(KC_LCTL);
+    if (bits & 0x8) mods |= MOD_BIT(KC_LSFT);
+    return mods;
+}
+
+// Modifiers each matrix key was pressed with, so its release matches its press
+// even if the layer changed while the key was held.
+static uint8_t key_layer_mods[MATRIX_ROWS][MATRIX_COLS];
+
+static bool apply_layer_mods(uint16_t keycode, keyrecord_t *record) {
+    uint8_t row = record->event.key.row;
+    uint8_t col = record->event.key.col;
+
+    if (record->event.pressed) {
+        key_layer_mods[row][col] = layer_mods(get_highest_layer(layer_state));
+    }
+
+    uint8_t mods = key_layer_mods[row][col];
+    if (mods == 0) {
+        return true;
+    }
+
+    uint16_t modded_keycode = keycode | ((uint16_t)mods << 8);
+    if (record->event.pressed) {
+        register_code16(modded_keycode);
+    } else {
+        unregister_code16(modded_keycode);
+    }
+    return false;
+}
+
 // Loop through layers with a key is mapped to KC_CYCLE_LAYERS.
 
 #define LAYER_CYCLE_START 0
@@ -271,6 +312,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false; // Tells QMK we handled this key, stop processing further
 
         default:
+            // Basic keycodes (<= 0xFF) get the layer's modifiers. TO() and RM_*
+            // keys are above that range, so they never get modifiers.
+            if (keycode <= 0xFF && keycode != KC_NO) {
+                return apply_layer_mods(keycode, record);
+            }
             return true; // Pass all other standard keys through normally
     }
 }
